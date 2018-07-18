@@ -25,7 +25,7 @@ async function saveFile(file: File): Promise<string> {
     responseType: 'stream'
   })
   const bucket = process.env.S3_BUCKET as string
-  const escapedFileName = file.name.replace(/[\^\*|\\&#34]/g, '_')
+  const escapedFileName = file.name.replace('\\', '_')
   const objectName = `${file.id}/${escapedFileName}`
   await s3.putObject(bucket, objectName, stream, file.size)
   return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${file.id}/${encodeURIComponent(escapedFileName)}`
