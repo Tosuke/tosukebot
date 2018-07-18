@@ -26,5 +26,5 @@ async function saveFile(file: File): Promise<string> {
   const bucket = process.env.S3_BUCKET as string
   const objectName = `${file.id}/${file.name}`
   await s3.putObject(bucket, objectName, stream, file.size)
-  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${objectName}`
+  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${encodeURI(objectName)}`
 }
