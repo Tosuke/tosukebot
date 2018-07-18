@@ -12,7 +12,7 @@ export default (controller: Botkit.SlackController) => {
     await postToIm(message.user!, {
       username: 'Backup bot',
       icon_emoji: ':frame_with_picture:',
-      text: `backed up your file:<${url}|${file.name}>`
+      text: `backed up your file: <${url}|${file.name.replace(/[|<>`\*\_@]/g, '-')}>`
     })
   })
 }
@@ -25,7 +25,8 @@ async function saveFile(file: File): Promise<string> {
     responseType: 'stream'
   })
   const bucket = process.env.S3_BUCKET as string
-  const objectName = `${file.id}/${file.name}`
+  const escapedFileName = file.name.replace(/[\^\*|\\&#34]/g, '_')
+  const objectName = `${file.id}/${escapedFileName}`
   await s3.putObject(bucket, objectName, stream, file.size)
-  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${file.id}/${encodeURIComponent(file.name)}`
+  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${file.id}/${encodeURIComponent(escapedFileName)}`
 }
