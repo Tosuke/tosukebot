@@ -1,5 +1,5 @@
 import Botkit from 'botkit'
-import slack, { postToIm } from '../slackClient'
+import { postToIm } from '../slackClient'
 import s3 from '../s3Client'
 import { File } from '../types'
 import axios from 'axios'
