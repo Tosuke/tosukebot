@@ -27,6 +27,8 @@
     "axios": "^0.18.0",
     "botkit": "^0.6.15",
     "dotenv-safe": "^6.0.0",
+    "librsvg": "^0.7.0",
+    "mathjax-node": "^2.1.1",
     "minio": "^6.0.0"
   }
 }

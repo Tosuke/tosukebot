@@ -1,26 +1,24 @@
 # build env
-FROM mhart/alpine-node:latest AS build
-RUN apk update && apk add --no-cache alpine-sdk openssl
+FROM node:10.6
+RUN echo 'deb http://deb.debian.org/debian experimental main contrib' >> /etc/apt/sources.list \
+ && echo 'deb http://deb.debian.org/debian unstable main contrib' >> /etc/apt/sources.list
+RUN apt-get update -y \
+  && apt-get -t experimental install --no-install-recommends -y -q \
+    librsvg2-dev librsvg2-common librsvg2-2 gir1.2-rsvg-2.0 \
+    libcairo2 libcairo2-dev \
+    libfontconfig1 libfontconfig1-dev \
+    libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
+    libc6-dev
 
 # build
 COPY package.json package.json
 COPY yarn.lock yarn.lock
+RUN yarn install
 COPY tsconfig.json tsconfig.json
 COPY .env.example .env.example
 COPY src src
-RUN yarn install && yarn build
-
-# run env
-FROM mhart/alpine-node:10.6
-RUN apk update && apk add --no-cache openssl
-RUN yarn global add forever
+RUN yarn build
 
 ENV NODE_ENV=production
-
-COPY --from=build /package.json package.json
-COPY --from=build /yarn.lock yarn.lock
-COPY --from=build /.env.example .env.example
-COPY --from=build /dist dist
-RUN yarn install
-
+RUN yarn global add forever
 CMD forever -f dist/index.js

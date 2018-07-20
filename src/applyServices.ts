@@ -1,8 +1,9 @@
 import Botkit from 'botkit'
 import filesaveService from './services/firesaveService'
 import simpleBotService from './services/simpleBotService'
+import mathService from './services/mathService'
 
-const services = [filesaveService, simpleBotService]
+const services = [filesaveService, simpleBotService, mathService]
 
 export default (controller: Botkit.SlackController) => {
   for (const service of services) {
