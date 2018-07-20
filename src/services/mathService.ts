@@ -14,34 +14,24 @@ function asMathBot(opts: Botkit.SlackMessage): Botkit.SlackMessage {
   }
 }
 
+function trimSource(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+}
+
 export default (controller: Botkit.SlackController) => {
-  controller.hears(/^\s*(?:la)?tex:([\s\S]*)/, 'ambient', async (bot, message) => {
-    const src = message
-      .match![1].replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
+  controller.hears(/^\s*(tex|latex|amath|mathml):([\s\S]*)/, 'ambient', async (bot, message) => {
+    const src = trimSource(message.match![2])
+    const formats = {
+      tex: 'TeX',
+      latex: 'TeX',
+      amath: 'AsciiMath',
+      mathml: 'MathML'
+    }
     try {
-      const hash = crypto
-        .createHash('md5')
-        .update(src)
-        .digest('hex')
-      const objectName = `USLACKBOT/MATH/${hash}.png`
-      const renderTask = mathjax
-        .typeset({
-          math: src,
-          format: 'TeX',
-          svg: true
-        })
-        .then(res => {
-          return svgToPng(res.svg, 4)
-        })
-
-      const exists = await objectExists(process.env.S3_BUCKET as string, objectName)
-      if (!exists) {
-        const pngBuf = await renderTask
-        await s3.putObject(process.env.S3_BUCKET as string, objectName, pngBuf)
-      }
-
+      const url = await processMath(src, formats[message.match![1]])
       bot.reply(
         message,
         asMathBot({
@@ -49,7 +39,7 @@ export default (controller: Botkit.SlackController) => {
           attachments: [
             {
               fallback: src,
-              image_url: createURL(objectName)
+              image_url: url
             }
           ]
         })
@@ -64,6 +54,31 @@ export default (controller: Botkit.SlackController) => {
       throw e
     }
   })
+}
+
+async function processMath(src: string, format: string): Promise<string> {
+  const hash = crypto
+    .createHash('md5')
+    .update(`${format}-${src}`)
+    .digest('hex')
+  const objectName = `USLACKBOT/MATH/${hash}.png`
+  const renderTask = mathjax
+    .typeset({
+      math: src,
+      format: format,
+      svg: true
+    })
+    .then(res => {
+      return svgToPng(res.svg, 4)
+    })
+
+  const exists = await objectExists(process.env.S3_BUCKET as string, objectName)
+  if (!exists) {
+    const pngBuf = await renderTask
+    await s3.putObject(process.env.S3_BUCKET as string, objectName, pngBuf)
+  }
+
+  return createURL(objectName)
 }
 
 function svgToPng(src: string, power: number = 1): Promise<Buffer> {
