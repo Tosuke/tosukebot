@@ -8,7 +8,8 @@ RUN apt-get update -y \
     libcairo2 libcairo2-dev \
     libfontconfig1 libfontconfig1-dev \
     libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
-    libc6-dev
+    libc6-dev \
+  && apt-get install --no-install-recommends -y -q fonts-noto-cjk
 
 # build
 COPY package.json package.json

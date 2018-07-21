@@ -1,4 +1,4 @@
-import Botkit from 'botkit'
+import Botkit, { teamsbot } from 'botkit'
 import * as mathjax from 'mathjax-node'
 import * as librsvg from 'librsvg'
 import crypto from 'crypto'
@@ -32,10 +32,14 @@ export default (controller: Botkit.SlackController) => {
     }
     try {
       const url = await processMath(src, formats[message.match![1]])
+      let text = `<@${message.user}>`
+      if (process.env.NODE_ENV !== 'production') {
+        text += ` ${url}`
+      }
       bot.reply(
         message,
         asMathBot({
-          text: `<@${message.user}>`,
+          text,
           attachments: [
             {
               fallback: src,
