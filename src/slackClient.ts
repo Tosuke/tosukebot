@@ -1,6 +1,5 @@
 import { WebClient, WebAPICallResult ,ChatPostMessageArguments } from '@slack/client'
 
-console.log(process.env.SLACK_TOKEN)
 const client = new WebClient(process.env.SLACK_TOKEN)
 
 export default client

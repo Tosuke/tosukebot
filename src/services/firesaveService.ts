@@ -1,15 +1,18 @@
 import Botkit from 'botkit'
-import { postToIm } from '../slackClient'
+import slack, { postToIm } from '../slackClient'
 import s3 from '../s3Client'
 import { File } from '../types'
 import axios from 'axios'
 
 export default (controller: Botkit.SlackController) => {
-  controller.on('file_share', async (bot, message) => {
-    const file = (message as any).file as File
+  controller.on('file_shared', async (bot, message) => {
+    const mes: any = message
+    const file = ((await slack.files.info({
+      file: mes.file_id
+    })) as any).file as File
     if (file.is_external) return
     const url = await saveFile(file)
-    await postToIm(message.user!, {
+    await postToIm(mes.user_id, {
       username: 'Backup bot',
       icon_emoji: ':frame_with_picture:',
       text: `backed up your file: <${url}|${file.name.replace(/[|<>`\*\_@]/g, '-')}>`
