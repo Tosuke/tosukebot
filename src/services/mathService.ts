@@ -22,7 +22,7 @@ function trimSource(text: string): string {
 }
 
 export default (controller: Botkit.SlackController) => {
-  controller.hears(/^\s*(tex|latex|amath|mathml):([\s\S]*)/, 'ambient', async (bot, message) => {
+  controller.hears(/^\s*(tex|latex|amath|mathml):([\s\S]*)/, ['ambient', 'direct_message'], async (bot, message) => {
     const src = trimSource(message.match![2])
     const formats = {
       tex: 'TeX',
