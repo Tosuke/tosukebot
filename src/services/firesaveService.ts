@@ -4,11 +4,19 @@ import s3 from '../s3Client'
 import { File } from '../types'
 import axios from 'axios'
 
+const mutex = new Set<string>()
+
 export default (controller: Botkit.SlackController) => {
   controller.on('file_shared', async (bot, message) => {
+    console.log(message)
     const mes: any = message
+    const fileId: string = mes.file_id
+    
+    if (mutex.has(fileId)) return
+
+    mutex.add(fileId)
     const file = ((await slack.files.info({
-      file: mes.file_id
+      file: fileId
     })) as any).file as File
     if (file.is_external) return
     const url = await saveFile(file)
@@ -17,6 +25,7 @@ export default (controller: Botkit.SlackController) => {
       icon_emoji: ':frame_with_picture:',
       text: `backed up your file: <${url}|${file.name.replace(/[|<>`\*\_@]/g, '-')}>`
     })
+    mutex.delete(fileId)
   })
 }
 
