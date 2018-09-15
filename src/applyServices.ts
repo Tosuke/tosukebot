@@ -7,8 +7,18 @@ import mathService from './services/mathService'
 // 環境変数のフォーマット
 const envOf = (name: string) => `USE_${name.toUpperCase()}`;
 
+const toBool = (value: string) => value.toLowerCase() === "true" ? true : value.toLocaleLowerCase() === "false" ? false : undefined;
+
 // 環境変数にてUSE_**がtrueであるか、undefinedである場合trueを返す関数
-const use = (name: string) => process.env[envOf(name)] === undefined ? true : process.env[envOf(name)];
+const use = (name: string) => {
+  var e = process.env[envOf(name)];
+
+  if (e === undefined) {
+    return true
+  } else {
+    return toBool(e);
+  }
+}
 
 
 // サービス
