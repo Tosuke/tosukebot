@@ -7,6 +7,7 @@ import mathService from './services/mathService'
 // 環境変数のフォーマット
 const envOf = (name: string) => `USE_${name.toUpperCase()}`;
 
+// 文字列をbooleanにするやつ
 const toBool = (value: string) => value.toLowerCase() === "true" ? true : value.toLocaleLowerCase() === "false" ? false : undefined;
 
 // 環境変数にてUSE_**がtrueであるか、undefinedである場合trueを返す関数
@@ -19,7 +20,6 @@ const use = (name: string) => {
     return toBool(e);
   }
 }
-
 
 // サービス
 const services = [
