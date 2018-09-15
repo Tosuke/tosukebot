@@ -26,7 +26,6 @@ const services = [
   { name: "echo", instance: echoService },
   { name: "filesave", instance: filesaveService },
   { name: "math", instance: mathService},
-  { name: "simple_bot", instance: simpleBotService },
 ];
 
 export default (controller: Botkit.SlackController) => {
