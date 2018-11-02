@@ -15,7 +15,7 @@ const client = new minio.Client({
 export default client
 
 export function createURL(objectName: string, bucket: string = process.env.S3_BUCKET as string): string {
-  return `${process.env.S3_ENDPOINT}/${bucket}/${objectName}`
+  return `${process.env.S3_PUBLIC_ENDPOINT}/${objectName}`
 }
 
 export function objectExists(bucketName: string, objectName: string) : Promise<boolean>{
